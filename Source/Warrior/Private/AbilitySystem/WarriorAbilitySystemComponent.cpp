@@ -172,9 +172,6 @@ void UWarriorAbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FWarr
 		AbilitySpec.SourceObject = GetAvatarActor();
 		AbilitySpec.Level = ApplyLevel;
 		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.InputTag);
-		// AddUnique: 将句柄添加到输出数组，避免重复
-		// GiveAbility() 将技能添加到 AbilitySystemComponent 的激活技能列表中
-		// 返回的 FGameplayAbilitySpecHandle 用于后续引用这个技能
 		OutGrantedAbilitySpecHandles.AddUnique(GiveAbility(AbilitySpec));
 	}
 	for (const FWarrorHeroSpecialAbilitySet& AbilitySet : InSpecialWeaponAbilities) {
@@ -183,9 +180,6 @@ void UWarriorAbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FWarr
 		AbilitySpec.SourceObject = GetAvatarActor();
 		AbilitySpec.Level = ApplyLevel;
 		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.InputTag);
-		// AddUnique: 将句柄添加到输出数组，避免重复
-		// GiveAbility() 将技能添加到 AbilitySystemComponent 的激活技能列表中
-		// 返回的 FGameplayAbilitySpecHandle 用于后续引用这个技能
 		OutGrantedAbilitySpecHandles.AddUnique(GiveAbility(AbilitySpec));
 	}
 
@@ -206,27 +200,18 @@ void UWarriorAbilitySystemComponent::RemovedGrantedHeroWeaponAbilities(UPARAM(re
 bool UWarriorAbilitySystemComponent::TryActivateAbilityByTag(FGameplayTag AbilityTagToActivate)
 {
 	check(AbilityTagToActivate.IsValid());
-	// 存储找到的技能规格的数组
 	TArray<FGameplayAbilitySpec*> FoundAbilitySpecs;
-	// 根据标签查找所有匹配的技能规格
 	GetActivatableGameplayAbilitySpecsByAllMatchingTags(AbilityTagToActivate.GetSingleTagContainer(), FoundAbilitySpecs);
 
-	// 如果找到了匹配的技能
 	if (!FoundAbilitySpecs.IsEmpty())
 	{
-		// 随机选择一个技能索引（从0到技能数量-1）
 		const int32 RandomAbilityIndex = FMath::RandRange(0, FoundAbilitySpecs.Num() - 1);
-		// 获取要激活的技能规格指针
 		FGameplayAbilitySpec* SpecToActivate = FoundAbilitySpecs[RandomAbilityIndex];
-		// 确保技能规格有效
 		check(SpecToActivate);
-		// 如果该技能当前未激活
 		if (!SpecToActivate->IsActive())
 		{
-			// 尝试激活该技能并返回结果
 			return TryActivateAbility(SpecToActivate->Handle);
 		}
 	}
-	// 如果没有找到技能或激活失败，返回false
 	return false;
 }
